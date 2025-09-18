@@ -60,7 +60,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-                  Faith Questions
+                  Downriver Christian Questions
                 </h1>
                 <p className="text-sm text-slate-500 -mt-1">Anonymous Christian Q&A & Forums</p>
               </div>
@@ -141,4 +141,5 @@ export default function Layout({ children, currentPageName }) {
       </footer>
     </div>
   );
+
 }
