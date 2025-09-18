@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Christian Club Answers</title>
+  <!-- React + ReactDOM from CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel to compile JSX in the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-  <script type="module" src="/main.js"></script>
+  <div id="root"></div>
+
+  <!-- Load your main layout (JSX is fine, Babel will handle it) -->
+  <script type="text/babel" src="./Layout.js"></script>
+
+  <!-- Example: you can directly load a page -->
+  <script type="text/babel" src="./pages/Questions.jsx"></script>
+
+  <!-- Mount React app -->
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(Layout));
+  </script>
 </body>
 </html>
