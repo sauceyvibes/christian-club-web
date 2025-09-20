@@ -1,0 +1,14 @@
+/* Additional custom styles for the app */
+.App {
+  text-align: center;
+}
+
+.peaceful-shadow {
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+}
+
+.gentle-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+}
