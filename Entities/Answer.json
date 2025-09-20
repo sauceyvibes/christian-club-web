@@ -1,0 +1,32 @@
+{
+  "name": "Answer",
+  "type": "object",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "description": "ID of the question being answered"
+    },
+    "content": {
+      "type": "string",
+      "description": "Answer content"
+    },
+    "author_name": {
+      "type": "string",
+      "description": "Name of the person answering (optional)"
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is from a verified religious leader"
+    },
+    "helpful_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of people who found this helpful"
+    }
+  },
+  "required": [
+    "question_id",
+    "content"
+  ]
+}
