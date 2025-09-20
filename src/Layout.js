@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { createPageUrl } from "./utils";
 import { Heart, MessageCircle, HelpCircle, Users, BookOpen, Cross } from "lucide-react";
 
-export default function Layout({ children, currentPageName }) {
+export default function Layout({ children }) {
   const location = useLocation();
 
   const navigation = [
@@ -141,5 +141,4 @@ export default function Layout({ children, currentPageName }) {
       </footer>
     </div>
   );
-
 }
