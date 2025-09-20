@@ -1,0 +1,52 @@
+{
+  "name": "ForumPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Forum post title"
+    },
+    "content": {
+      "type": "string",
+      "description": "Forum post content"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "general_discussion",
+        "bible_study",
+        "prayer_requests",
+        "testimonies",
+        "youth",
+        "family",
+        "missions",
+        "other"
+      ],
+      "default": "general_discussion",
+      "description": "Forum category"
+    },
+    "author_name": {
+      "type": "string",
+      "description": "Name of the poster (optional, can be anonymous)"
+    },
+    "is_pinned": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this post is pinned"
+    },
+    "reply_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of replies"
+    },
+    "view_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of views"
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}
