@@ -1,217 +1,161 @@
-// Base Entity class for common functionality
-class BaseEntity {
-  constructor() {
-    this.storageKey = this.constructor.name.toLowerCase() + 's';
+
+// Simple localStorage-based entities for deployment
+class SimpleEntity {
+  constructor(name) {
+    this.name = name;
   }
 
-  // Get all items from localStorage
-  getAll() {
-    const items = localStorage.getItem(this.storageKey);
-    return items ? JSON.parse(items) : [];
+  getStorageKey() {
+    return `christian_app_${this.name}`;
   }
 
-  // Save all items to localStorage
-  saveAll(items) {
-    localStorage.setItem(this.storageKey, JSON.stringify(items));
-  }
-
-  // Create a new item
   async create(data) {
     const items = this.getAll();
     const newItem = {
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+      id: Date.now().toString() + Math.random().toString(36).substr(2),
       created_date: new Date().toISOString(),
-      updated_date: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       ...data
     };
     items.push(newItem);
-    this.saveAll(items);
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(items));
     return newItem;
   }
 
-  // Get items with optional sorting and limiting
-  async list(sortBy = '-created_date', limit = null) {
-    let items = this.getAll();
-    
-    // Sort items
-    if (sortBy) {
-      const isDesc = sortBy.startsWith('-');
-      const sortField = isDesc ? sortBy.slice(1) : sortBy;
-      
-      items.sort((a, b) => {
-        if (sortField === 'created_date' || sortField === 'updated_date') {
-          const aDate = new Date(a[sortField]);
-          const bDate = new Date(b[sortField]);
-          return isDesc ? bDate - aDate : aDate - bDate;
-        }
-        
-        if (a[sortField] < b[sortField]) return isDesc ? 1 : -1;
-        if (a[sortField] > b[sortField]) return isDesc ? -1 : 1;
-        return 0;
-      });
+  async list(sortBy, limit) {
+    const items = this.getAll();
+    // Simple sorting by created_date
+    if (sortBy === "-created_date" || sortBy === "-created_at") {
+      items.sort((a, b) => new Date(b.created_date || b.created_at) - new Date(a.created_date || a.created_at));
     }
-    
-    // Limit results if specified
-    if (limit) {
-      items = items.slice(0, limit);
-    }
-    
-    return items;
+    return limit ? items.slice(0, limit) : items;
   }
 
-  // Get a single item by ID
   async get(id) {
     const items = this.getAll();
-    return items.find(item => item.id === id);
+    return items.find(item => item.id === id) || null;
   }
 
-  // Update an item
   async update(id, data) {
     const items = this.getAll();
     const index = items.findIndex(item => item.id === id);
-    
     if (index !== -1) {
-      items[index] = {
-        ...items[index],
-        ...data,
-        updated_date: new Date().toISOString()
-      };
-      this.saveAll(items);
+      items[index] = { ...items[index], ...data, updated_at: new Date().toISOString() };
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(items));
       return items[index];
     }
-    
     return null;
   }
 
-  // Delete an item
-  async delete(id) {
-    const items = this.getAll();
-    const filteredItems = items.filter(item => item.id !== id);
-    
-    if (filteredItems.length < items.length) {
-      this.saveAll(filteredItems);
-      return true;
-    }
-    
-    return false;
-  }
-
-  // Find items by criteria
   async find(criteria) {
     const items = this.getAll();
     return items.filter(item => {
       return Object.entries(criteria).every(([key, value]) => {
-        if (typeof value === 'string') {
-          return item[key] && item[key].toLowerCase().includes(value.toLowerCase());
-        }
         return item[key] === value;
       });
     });
   }
-}
 
-// Question Entity
-export class Question extends BaseEntity {
-  constructor() {
-    super();
+  getAll() {
+    try {
+      const data = localStorage.getItem(this.getStorageKey());
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error(`Error loading ${this.name}:`, error);
+      return [];
+    }
   }
 
   async incrementViewCount(id) {
-    const question = await this.get(id);
-    if (question) {
+    const item = await this.get(id);
+    if (item) {
       return await this.update(id, {
-        view_count: (question.view_count || 0) + 1
+        view_count: (item.view_count || 0) + 1
       });
     }
     return null;
   }
 
   async incrementAnswerCount(id) {
-    const question = await this.get(id);
-    if (question) {
+    const item = await this.get(id);
+    if (item) {
       return await this.update(id, {
-        answer_count: (question.answer_count || 0) + 1
-      });
-    }
-    return null;
-  }
-}
-
-// Answer Entity  
-export class Answer extends BaseEntity {
-  constructor() {
-    super();
-  }
-
-  async getByQuestionId(questionId) {
-    return await this.find({ question_id: questionId });
-  }
-
-  async incrementHelpfulCount(id) {
-    const answer = await this.get(id);
-    if (answer) {
-      return await this.update(id, {
-        helpful_count: (answer.helpful_count || 0) + 1
-      });
-    }
-    return null;
-  }
-}
-
-// ForumPost Entity
-export class ForumPost extends BaseEntity {
-  constructor() {
-    super();
-  }
-
-  async incrementViewCount(id) {
-    const post = await this.get(id);
-    if (post) {
-      return await this.update(id, {
-        view_count: (post.view_count || 0) + 1
+        answer_count: (item.answer_count || 0) + 1
       });
     }
     return null;
   }
 
   async incrementReplyCount(id) {
-    const post = await this.get(id);
-    if (post) {
+    const item = await this.get(id);
+    if (item) {
       return await this.update(id, {
-        reply_count: (post.reply_count || 0) + 1
+        reply_count: (item.reply_count || 0) + 1
+      });
+    }
+    return null;
+  }
+
+  async incrementHelpfulCount(id) {
+    const item = await this.get(id);
+    if (item) {
+      return await this.update(id, {
+        helpful_count: (item.helpful_count || 0) + 1
       });
     }
     return null;
   }
 }
 
-// ForumReply Entity
-export class ForumReply extends BaseEntity {
+// Extended classes
+class QuestionEntity extends SimpleEntity {
   constructor() {
-    super();
+    super('questions');
+  }
+}
+
+class AnswerEntity extends SimpleEntity {
+  constructor() {
+    super('answers');
+  }
+
+  async getByQuestionId(questionId) {
+    return this.find({ question_id: questionId });
+  }
+}
+
+class ForumPostEntity extends SimpleEntity {
+  constructor() {
+    super('forum_posts');
+  }
+}
+
+class ForumReplyEntity extends SimpleEntity {
+  constructor() {
+    super('forum_replies');
   }
 
   async getByPostId(postId) {
-    return await this.find({ post_id: postId });
+    return this.find({ post_id: postId });
   }
 
   async getThreadReplies(postId) {
     const replies = await this.getByPostId(postId);
-    // Sort by created_date to show chronological conversation
-    return replies.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    return replies.sort((a, b) => new Date(a.created_date || a.created_at) - new Date(b.created_date || b.created_at));
   }
 }
 
-// Create singleton instances
-export const question = new Question();
-export const answer = new Answer(); 
-export const forumPost = new ForumPost();
-export const forumReply = new ForumReply();
+// Create instances
+export const Question = new QuestionEntity();
+export const Answer = new AnswerEntity();
+export const ForumPost = new ForumPostEntity();
+export const ForumReply = new ForumReplyEntity();
 
-// Default exports for backwards compatibility
+// Default export
 export default {
-  Question: question,
-  Answer: answer,
-  ForumPost: forumPost, 
-  ForumReply: forumReply
+  Question,
+  Answer,
+  ForumPost,
+  ForumReply
 };

@@ -1,6 +1,12 @@
-// Utility functions for the app
-
 export const createPageUrl = (pageName) => {
+  // Handle both the pageName format and direct URLs
+  if (pageName.includes('?')) {
+    // Handle URLs like "Question?id=123"
+    const [page, query] = pageName.split('?');
+    const pageUrl = createPageUrl(page);
+    return `${pageUrl}?${query}`;
+  }
+
   const pageMap = {
     'Questions': '/questions',
     'AskQuestion': '/ask-question', 
@@ -26,6 +32,7 @@ export const generateId = () => {
 };
 
 export const truncateText = (text, maxLength = 150) => {
+  if (!text) return '';
   if (text.length <= maxLength) return text;
   return text.substr(0, maxLength) + '...';
 };
