@@ -3,12 +3,12 @@ import { Question } from "../entities/all";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/all";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
-import { Label } from "../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Alert, AlertDescription } from "../components/ui/alert";
+import { Button } from "../components/ui/all";
+import { Input } from "../components/ui/all";
+import { Textarea } from "../components/ui/all";
+import { Label } from "../components/ui/all";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/all";
+import { Alert, AlertDescription } from "../components/ui/all";
 import {
   Shield,
   MessageCircle,
