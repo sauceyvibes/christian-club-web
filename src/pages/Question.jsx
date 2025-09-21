@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Question, Answer, User } from "@/entities/all";
+import { Question, Answer, User } from "../entities/all";
 import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { createPageUrl } from "../utils";
+import { Card, CardContent, CardHeader } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Textarea } from "../components/ui/textarea";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
+import { Alert, AlertDescription } from "../components/ui/alert";
 import { 
   ArrowLeft, 
   MessageCircle, 
