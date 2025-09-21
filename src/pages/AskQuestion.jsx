@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Question } from "../entities/all";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/all";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
