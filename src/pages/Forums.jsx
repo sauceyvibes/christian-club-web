@@ -19,7 +19,7 @@ import {
   Users,
   BookOpen,
   Heart,
-  Handshake
+  Globe
 } from "lucide-react";
 import { format } from "date-fns";
 
