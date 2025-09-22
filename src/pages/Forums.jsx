@@ -9,7 +9,7 @@ import { Badge } from "../components/ui/all";
 import { Alert, AlertDescription } from "../components/ui/all";
 import { 
   Search, 
-  MessageSquare, // Use MessageSquare instead of MessageCircle for forums
+  MessageSquare,
   Eye, 
   Clock, 
   Plus,
@@ -17,7 +17,7 @@ import {
   Users,
   BookOpen,
   Heart,
-  Globe // Use Globe instead of Handshake for missions
+  Globe
 } from "lucide-react";
 import { format } from "date-fns";
 
