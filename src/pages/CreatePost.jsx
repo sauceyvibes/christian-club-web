@@ -14,7 +14,7 @@ import {
   BookOpen, 
   Heart, 
   MessageSquare,
-  Handshake,
+  Globe,
   CheckCircle,
   Plus
 } from "lucide-react";
@@ -26,7 +26,7 @@ const categoryIcons = {
   testimonies: MessageSquare,
   youth: Users,
   family: Heart,
-  missions: Handshake,
+  missions: Globe,
   other: MessageSquare
 };
 

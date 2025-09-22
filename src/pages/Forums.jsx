@@ -8,18 +8,16 @@ import { Textarea } from "../components/ui/all";
 import { Badge } from "../components/ui/all";
 import { Alert, AlertDescription } from "../components/ui/all";
 import { 
-  ArrowLeft, 
-  MessageCircle, 
+  Search, 
+  MessageSquare, // Use MessageSquare instead of MessageCircle for forums
   Eye, 
   Clock, 
-  Send,
-  CheckCircle,
-  User,
+  Plus,
   Pin,
   Users,
   BookOpen,
   Heart,
-  Globe
+  Globe // Use Globe instead of Handshake for missions
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -41,7 +39,7 @@ const categoryIcons = {
   testimonies: MessageCircle,
   youth: Users,
   family: Heart,
-  missions: Handshake,
+  missions: Globe,
   other: MessageCircle
 };
 

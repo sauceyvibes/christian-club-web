@@ -8,15 +8,15 @@ import { Textarea } from "../components/ui/all";
 import { Badge } from "../components/ui/all";
 import { Alert, AlertDescription } from "../components/ui/all";
 import { 
-  ArrowLeft, 
+  Search, 
   MessageCircle, 
   Eye, 
   Clock, 
-  ThumbsUp,
+  Plus,
+  BookOpen,
   Heart,
-  Send,
-  CheckCircle,
-  User
+  Users,
+  Filter
 } from "lucide-react";
 import { format } from "date-fns";
 

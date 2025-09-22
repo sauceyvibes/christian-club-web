@@ -9,14 +9,15 @@ import { Textarea } from "../components/ui/all";
 import { Label } from "../components/ui/all";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/all";
 import { Alert, AlertDescription } from "../components/ui/all";
-import {
-  Shield,
-  MessageCircle,
-  Heart,
+import { 
+  ArrowLeft, 
+  MessageCircle, 
+  Heart, 
   CheckCircle,
-  ArrowLeft,
-  Lock } from
-"lucide-react";
+  Plus,
+  Shield,
+  Lock
+} from "lucide-react";
 
 export default function AskQuestion() {
   const navigate = useNavigate();
