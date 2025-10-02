@@ -208,8 +208,6 @@ export const SelectTrigger = ({
   children, 
   className = "",
   value,
-  onValueChange,
-  disabled = false,
   isOpen,
   setIsOpen,
   ...props 
@@ -217,14 +215,15 @@ export const SelectTrigger = ({
   return (
     <button
       type="button"
-      disabled={disabled}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       onClick={() => setIsOpen && setIsOpen(!isOpen)}
       {...props}
     >
-      {children}
+      <span className="block truncate">
+        {React.Children.toArray(children).find(child => child.type === SelectValue) || children}
+      </span>
       <svg
-        className="h-4 w-4 opacity-50"
+        className="h-4 w-4 opacity-50 ml-2 flex-shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -235,11 +234,12 @@ export const SelectTrigger = ({
   );
 };
 
-export const SelectValue = ({ placeholder, value }) => (
-  <span className={value ? "" : "text-gray-500"}>
+
+export const SelectValue = ({ placeholder, value }) => {
+  return <span className={value ? "" : "text-gray-500"}>
     {value || placeholder}
   </span>
-);
+};
 
 export const SelectContent = ({ 
   children, 
