@@ -162,6 +162,8 @@ export default function AskQuestion() {
                 <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
                   <SelectTrigger className="mt-2 border-slate-200 focus:border-blue-400 bg-white/70">
                     <SelectValue placeholder="Select a category" />
+                      {getSelectedLabel()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) =>
