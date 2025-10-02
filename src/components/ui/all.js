@@ -236,7 +236,7 @@ export const SelectTrigger = ({
 
 
 export const SelectValue = ({ placeholder, value }) => {
-  return <span className={value ? "" : "text-gray-500"}>
+  return <span>
     {value || placeholder}
   </span>
 };
