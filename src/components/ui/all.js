@@ -236,8 +236,9 @@ export const SelectTrigger = ({
 
 
 export const SelectValue = ({ placeholder, value }) => {
-  // This needs to be handled by the parent Select component
-  return <span>{value || placeholder}</span>;
+  return <span className={`block truncate ${!value ? 'text-gray-400' : ''}`}>
+    {value || placeholder}
+  </span>
 };
 
 export const SelectContent = ({ 
