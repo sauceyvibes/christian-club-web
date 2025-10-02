@@ -39,6 +39,10 @@ export default function AskQuestion() {
   { value: "church_life", label: "Church & Community" },
   { value: "other", label: "Other Questions" }];
 
+const getSelectedLabel = () => {
+  const selected = categories.find(cat => cat.value === formData.category);
+  return selected ? selected.label : "Select a category";
+};
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -162,8 +166,8 @@ export default function AskQuestion() {
                 <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
                   <SelectTrigger className="mt-2 border-slate-200 focus:border-blue-400 bg-white/70">
                     <SelectValue placeholder="Select a category" />
+                     {getSelectedLabel()}
                   </SelectTrigger>
-                  {getSelectedLabel()}
                   <SelectContent>
                     {categories.map((category) =>
                     <SelectItem key={category.value} value={category.value}>
