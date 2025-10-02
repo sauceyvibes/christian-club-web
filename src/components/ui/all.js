@@ -236,9 +236,8 @@ export const SelectTrigger = ({
 
 
 export const SelectValue = ({ placeholder, value }) => {
-  return <span>
-    {value || placeholder}
-  </span>
+  // This needs to be handled by the parent Select component
+  return <span>{value || placeholder}</span>;
 };
 
 export const SelectContent = ({ 
