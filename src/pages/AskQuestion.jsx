@@ -41,7 +41,7 @@ export default function AskQuestion() {
 
 const getSelectedLabel = () => {
   if (!formData.category || formData.category === "other") {
-    return null; // This will show the placeholder
+    return null; "Select a catagory"
   }
   const selected = categories.find(cat => cat.value === formData.category);
   return selected ? selected.label : null;
@@ -250,4 +250,5 @@ const getSelectedLabel = () => {
 
 
 }
+
 
