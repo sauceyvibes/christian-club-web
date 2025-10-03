@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Question, Answer } from "../entities/all";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Question } from "../entities/all";
+import { Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { 
   Card, 
   CardContent, 
-  CardHeader, 
-  CardTitle,
+  CardHeader,
   Button,
   Input,
   Badge,
-  Textarea,
-  Alert,
-  AlertDescription
+  Tabs,
+  TabsList,
+  TabsTrigger
 } from "../components/ui/all";
 import { 
   Search, 
@@ -23,12 +22,7 @@ import {
   BookOpen,
   Heart,
   Users,
-  Filter,
-  ArrowLeft,    // ADD THIS
-  CheckCircle,  // ADD THIS
-  Send,         // ADD THIS
-  User,         // ADD THIS
-  ThumbsUp      // ADD THIS
+  Filter
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -47,6 +41,7 @@ export default function Questions() {
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const loadQuestions = async () => {
     setIsLoading(true);
@@ -64,11 +59,26 @@ export default function Questions() {
     loadQuestions();
   }, []);
 
-  const filteredQuestions = questions.filter(q => 
-    !searchTerm.trim() || 
-    (q.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (q.content || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter questions based on category and search
+  const filteredQuestions = questions.filter(q => {
+    const matchesCategory = selectedCategory === "all" || q.category === selectedCategory;
+    const matchesSearch = !searchTerm.trim() || 
+      (q.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (q.content || '').toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const categories = [
+    { value: "all", label: "All", icon: Filter },
+    { value: "theology", label: "Theology", icon: BookOpen },
+    { value: "prayer", label: "Prayer", icon: Heart },
+    { value: "daily_life", label: "Daily Life", icon: Users },
+    { value: "bible_study", label: "Bible Study", icon: BookOpen },
+    { value: "relationships", label: "Relationships", icon: Heart },
+    { value: "faith_journey", label: "Faith Journey", icon: Users },
+    { value: "church_life", label: "Church Life", icon: Users },
+    { value: "other", label: "Other", icon: MessageCircle }
+  ];
 
   return (
     <div className="min-h-screen py-8">
@@ -89,22 +99,46 @@ export default function Questions() {
           </Link>
         </div>
 
-        {/* Search */}
-        <Card className="mb-8">
+        {/* Search and Category Filter */}
+        <Card className="mb-8 bg-white/80 backdrop-blur-sm border-blue-100 shadow-lg">
           <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <Input
-                placeholder="Search questions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-11"
-              />
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <Input
+                  placeholder="Search questions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-11 border-slate-200 focus:border-blue-400 bg-white/70"
+                />
+              </div>
+            </div>
+
+            {/* Category Tabs */}
+            <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+              <TabsList className="w-full grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1 bg-slate-100 p-1 rounded-xl h-auto">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category.value}
+                    value={category.value}
+                    className="flex items-center justify-center gap-1 px-2 py-2 text-xs md:text-sm whitespace-nowrap"
+                  >
+                    <category.icon className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">{category.label}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+
+            {/* Category count display */}
+            <div className="mt-2 text-sm text-slate-600">
+              Showing {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''}
+              {selectedCategory !== "all" && ` in ${selectedCategory.replace(/_/g, ' ')}`}
             </div>
           </CardContent>
         </Card>
 
-        {/* Questions */}
+        {/* Questions List */}
         {isLoading ? (
           <div className="grid gap-6">
             {Array(3).fill(0).map((_, i) => (
@@ -124,7 +158,9 @@ export default function Questions() {
               <MessageCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-600 mb-2">No Questions Found</h3>
               <p className="text-slate-500 mb-6">
-                {searchTerm ? "Try a different search" : "Be the first to ask a question"}
+                {searchTerm || selectedCategory !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "Be the first to ask a question"}
               </p>
               <Link to={createPageUrl("AskQuestion")}>
                 <Button>

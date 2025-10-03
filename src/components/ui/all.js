@@ -172,13 +172,12 @@ export const AlertDescription = ({
 }) => (
   <div
     className={`text-sm ${className}`}
-    {...props}
+{...props}
   >
     {children}
   </div>
 );
 
-// Select Components
 export const Select = ({ 
   children, 
   value, 
@@ -188,8 +187,20 @@ export const Select = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isOpen && !event.target.closest('.select-container')) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+  
   return (
-    <div className="relative" {...props}>
+    <div className="relative select-container" {...props}>
       {React.Children.map(children, child => {
         if (!child) return null;
         return React.cloneElement(child, { 
@@ -208,10 +219,9 @@ export const SelectTrigger = ({
   children, 
   className = "",
   value,
-  onValueChange,
-  disabled = false,
   isOpen,
   setIsOpen,
+  disabled = false,
   ...props 
 }) => {
   return (
@@ -219,12 +229,12 @@ export const SelectTrigger = ({
       type="button"
       disabled={disabled}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      onClick={() => setIsOpen && setIsOpen(!isOpen)}
+      onClick={() => !disabled && setIsOpen && setIsOpen(!isOpen)}
       {...props}
     >
       {children}
       <svg
-        className="h-4 w-4 opacity-50"
+        className="h-4 w-4 opacity-50 ml-2 flex-shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -235,11 +245,14 @@ export const SelectTrigger = ({
   );
 };
 
-export const SelectValue = ({ placeholder, value }) => (
-  <span className={value ? "" : "text-gray-500"}>
-    {value || placeholder}
-  </span>
-);
+export const SelectValue = ({ placeholder, value, children }) => {
+  // This component receives the actual display label from parent
+  return (
+    <span className={!value ? "text-gray-500" : ""}>
+      {children || value || placeholder}
+    </span>
+  );
+};
 
 export const SelectContent = ({ 
   children, 
@@ -254,10 +267,10 @@ export const SelectContent = ({
   
   return (
     <div
-      className={`absolute z-50 mt-1 w-full overflow-hidden rounded-md border bg-white text-gray-950 shadow-md ${className}`}
+      className={`absolute z-50 mt-1 w-full overflow-hidden rounded-md border bg-white shadow-lg ${className}`}
       {...props}
     >
-      <div className="p-1">
+      <div className="max-h-60 overflow-y-auto p-1">
         {React.Children.map(children, child => {
           if (!child) return null;
           return React.cloneElement(child, { 
@@ -282,11 +295,14 @@ export const SelectItem = ({
   ...props 
 }) => (
   <div
-    className={`relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 ${selectedValue === value ? 'bg-gray-100 font-medium' : ''} ${className}`}
+    className={`relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 ${selectedValue === value ? 'bg-blue-50 font-medium text-blue-600' : ''} ${className}`}
     onClick={() => onSelect?.(value)}
     {...props}
   >
     {children}
+    {selectedValue === value && (
+      <span className="ml-auto">✓</span>
+    )}
   </div>
 );
 
