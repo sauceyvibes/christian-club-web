@@ -165,7 +165,7 @@ const getSelectedLabel = () => {
                 </Label>
                 <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
                   <SelectTrigger className="mt-2 border-slate-200 focus:border-blue-400 bg-white/70">
-                    <SelectValue placeholder="Select a category" />
+                    {/* <SelectValue placeholder="Select a category" /> */}
                      {getSelectedLabel()}
                   </SelectTrigger>
                   <SelectContent>
@@ -244,5 +244,6 @@ const getSelectedLabel = () => {
         </Card>
       </div>
     </div>);
+
 
 }
