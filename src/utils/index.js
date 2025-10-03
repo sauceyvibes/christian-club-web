@@ -3,8 +3,8 @@ export const createPageUrl = (pageName) => {
   if (pageName.includes('?')) {
     // Handle URLs like "Question?id=123"
     const [page, query] = pageName.split('?');
-    const pageUrl = createPageUrl(page);
-    return `${pageUrl}?${query}`;
+    const baseUrl = createPageUrl(page);
+    return `${baseUrl}?${query}`;
   }
 
   const pageMap = {
