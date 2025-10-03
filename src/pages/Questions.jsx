@@ -173,7 +173,7 @@ export default function Questions() {
         ) : (
           <div className="grid gap-6">
             {filteredQuestions.map((question) => (
-              <Link key={question.id} to={createPageUrl(`Question?id=${question.id}`)}>
+              <Link key={question.id} to={createPageUrl(`/Question?id=${question.id}`)}>
                 <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-3">
@@ -215,4 +215,5 @@ export default function Questions() {
       </div>
     </div>
   );
+
 }
