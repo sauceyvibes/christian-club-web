@@ -40,6 +40,7 @@ export default function CreatePost() {
   });
 
   const categories = [
+    { value: "Select a value", label: "Select a value" },
     { value: "general_discussion", label: "General Discussion" },
     { value: "bible_study", label: "Bible Study" },
     { value: "prayer_requests", label: "Prayer Requests" },
