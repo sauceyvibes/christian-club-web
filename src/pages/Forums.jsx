@@ -199,7 +199,7 @@ export default function Forums() {
             {filteredPosts.map((post) => {
               const CategoryIcon = categoryIcons[post.category] || MessageSquare;
               return (
-                <Link key={post.id} to={`/forum-post?id=${post.id}`}>
+                <Link key={post.id} to={`forum-post?id=${post.id}`}>
                   <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white/80 backdrop-blur-sm border-purple-100 cursor-pointer">
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4 mb-3">
