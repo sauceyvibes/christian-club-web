@@ -88,7 +88,7 @@ export default function Questions() {
             Questions & Answers
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            Explore anonymous questions about faith and Christianity.
+            Ask your faith questions anonymously and get thoughtful responses from our Christian community.
           </p>
           
           <Link to={createPageUrl("AskQuestion")}>
