@@ -92,7 +92,7 @@ export default function Questions() {
           </p>
           
           <Link to={createPageUrl("AskQuestion")}>
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full">
+            <Button className="bg-gradient-to-r from-cyan-700 via-sky-400 to-cyan-700 hover:from-sky-400 hover:via-cyan-700 hover:to-sky-400 text-white px-8 py-3 rounded-full">
               <Plus className="w-5 h-5 mr-2" />
               Ask Your Question
             </Button>
