@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Question, Answer } from "../entities/all";
 import { createPageUrl } from "../utils";
-import { question as Question, answer as Answer } from "../entities/all";
+import { Question as QuestionEntity, Answer as AnswerEntity } from "../entities/all";
 import { 
   Card, 
   CardContent, 
@@ -38,7 +38,7 @@ const categoryColors = {
   other: "bg-gray-100 text-gray-800 border-gray-200"
 };
 
-export default async function QuestionPage() {
+export default function QuestionPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const questionId = searchParams.get('id');
@@ -51,8 +51,8 @@ export default async function QuestionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-const questionData = await Question.get(questionId);
-const answersData = await Answer.getByQuestionId(questionId);
+  const questionEntity = new QuestionEntity();
+  const answerEntity = new AnswerEntity();
 
   useEffect(() => {
     const loadQuestion = async () => {
