@@ -50,6 +50,11 @@ export default function CreatePost() {
     { value: "other", label: "Other" }
   ];
 
+  const getSelectedLabel = () => {
+    const selected = categories.find(cat => cat.value === formData.category);
+    return selected ? selected.label : "Select a category";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.content.trim()) return;
@@ -145,7 +150,9 @@ export default function CreatePost() {
                   onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                 >
                   <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue>
+                      {getSelectedLabel()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
