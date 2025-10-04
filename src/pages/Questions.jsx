@@ -84,7 +84,7 @@ export default function Questions() {
     <div className="min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 via-sky-400 to-cyan-700 bg-clip-text text-transparent mb-4">
             Questions & Answers
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
