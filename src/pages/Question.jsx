@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Question, Answer } from "../entities/all";
 import { createPageUrl } from "../utils";
-import { Question as QuestionEntity, Answer as AnswerEntity } from "../entities/all";
 import { 
   Card, 
   CardContent, 
@@ -51,9 +50,6 @@ export default function QuestionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  const questionEntity = new QuestionEntity();
-  const answerEntity = new AnswerEntity();
-
   useEffect(() => {
     const loadQuestion = async () => {
       if (!questionId) {
@@ -62,25 +58,31 @@ export default function QuestionPage() {
       }
 
       setIsLoading(true);
-      const questionData = await questionEntity.get(questionId);
       
-      if (!questionData) {
-        navigate(createPageUrl("Questions"));
-        return;
-      }
+      try {
+        const questionData = await Question.get(questionId);
+        
+        if (!questionData) {
+          navigate(createPageUrl("Questions"));
+          return;
+        }
 
-      await questionEntity.incrementViewCount(questionId);
-      
-      setQuestion({ ...questionData, view_count: (questionData.view_count || 0) + 1 });
-      
-      const answersData = await answerEntity.getByQuestionId(questionId);
-      setAnswers(answersData.sort((a, b) => new Date(b.created_date || b.created_at) - new Date(a.created_date || a.created_at)));
+        await Question.incrementViewCount(questionId);
+        
+        setQuestion({ ...questionData, view_count: (questionData.view_count || 0) + 1 });
+        
+        const answersData = await Answer.getByQuestionId(questionId);
+        setAnswers(answersData.sort((a, b) => new Date(b.created_date || b.created_at) - new Date(a.created_date || a.created_at)));
+      } catch (error) {
+        console.error("Error loading question:", error);
+        navigate(createPageUrl("Questions"));
+      }
       
       setIsLoading(false);
     };
 
     loadQuestion();
-  }, [questionId]);
+  }, [questionId, navigate]);
 
   const handleSubmitAnswer = async (e) => {
     e.preventDefault();
@@ -89,7 +91,7 @@ export default function QuestionPage() {
     setIsSubmitting(true);
     
     try {
-      const answer = await answerEntity.create({
+      const answer = await Answer.create({
         question_id: questionId,
         content: newAnswer.trim(),
         author_name: authorName.trim() || null,
@@ -97,7 +99,7 @@ export default function QuestionPage() {
         helpful_count: 0
       });
 
-      await questionEntity.incrementAnswerCount(questionId);
+      await Question.incrementAnswerCount(questionId);
       
       setAnswers(prev => [answer, ...prev]);
       
@@ -120,14 +122,18 @@ export default function QuestionPage() {
   };
 
   const handleHelpful = async (answerId) => {
-    await answerEntity.incrementHelpfulCount(answerId);
-    setAnswers(prev => 
-      prev.map(answer => 
-        answer.id === answerId 
-          ? { ...answer, helpful_count: (answer.helpful_count || 0) + 1 }
-          : answer
-      )
-    );
+    try {
+      await Answer.incrementHelpfulCount(answerId);
+      setAnswers(prev => 
+        prev.map(answer => 
+          answer.id === answerId 
+            ? { ...answer, helpful_count: (answer.helpful_count || 0) + 1 }
+            : answer
+        )
+      );
+    } catch (error) {
+      console.error("Error marking helpful:", error);
+    }
   };
 
   if (isLoading) {
@@ -139,7 +145,7 @@ export default function QuestionPage() {
             <Card>
               <CardHeader>
                 <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-                <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                <div className="h-4 bg-slate-200 rounded w-1/2 mt-2"></div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -219,16 +225,14 @@ export default function QuestionPage() {
             
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <Clock className="w-4 h-4" />
-              <span>Asked {format(new Date(question.created_date || question.created_at || Date.now()), "MMMM d, yyyy 'at' h:mm a")}</span>
+              <span>Asked {format(new Date(question.created_date || question.created_at || Date.now()), "MMMM d, yyyy")}</span>
             </div>
           </CardHeader>
           
           <CardContent>
-            <div className="prose prose-slate max-w-none">
-              <p className="text-slate-700 text-lg leading-relaxed whitespace-pre-wrap">
-                {question.content}
-              </p>
-            </div>
+            <p className="text-slate-700 text-lg leading-relaxed whitespace-pre-wrap">
+              {question.content}
+            </p>
           </CardContent>
         </Card>
 
@@ -325,11 +329,9 @@ export default function QuestionPage() {
                     </div>
                   </div>
                   
-                  <div className="prose prose-slate max-w-none mb-4">
-                    <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-                      {answer.content}
-                    </p>
-                  </div>
+                  <p className="text-slate-700 leading-relaxed whitespace-pre-wrap mb-4">
+                    {answer.content}
+                  </p>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <Button
