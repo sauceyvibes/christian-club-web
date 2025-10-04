@@ -245,7 +245,7 @@ export const SelectTrigger = ({
   );
 };
 
-export const SelectValue = ({ placeholder, value, children }) => {
+export const SelectValue = ({ placeholder="select a catagory", value, children }) => {
   // This component receives the actual display label from parent
   return (
     <span className={!value ? "text-gray-500" : ""}>

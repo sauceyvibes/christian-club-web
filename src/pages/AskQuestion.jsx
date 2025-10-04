@@ -40,8 +40,11 @@ export default function AskQuestion() {
   { value: "other", label: "Other Questions" }];
 
 const getSelectedLabel = () => {
+  if (!formData.category || formData.category === "other") {
+    return "Select a catagory";
+  }
   const selected = categories.find(cat => cat.value === formData.category);
-  return selected ? selected.label : "Select a category";
+  return selected ? selected.label : null;
 };
 
   const handleChange = (field, value) => {
@@ -247,3 +250,6 @@ const getSelectedLabel = () => {
 
 
 }
+
+
+
