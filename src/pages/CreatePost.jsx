@@ -1,282 +1,204 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ForumPost } from "../entities/all";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { 
   Card, 
   CardContent, 
-  CardHeader,
+  CardHeader, 
+  CardTitle,
   Button,
   Input,
-  Badge,
-  Tabs,
-  TabsList,
-  TabsTrigger
+  Textarea,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "../components/ui/all";
 import { 
-  Search, 
-  MessageSquare, 
-  Eye, 
-  Clock, 
-  Plus,
-  Pin,
-  Users,
-  BookOpen,
-  Heart,
+  ArrowLeft, 
+  Users, 
+  BookOpen, 
+  Heart, 
+  MessageCircle,
   Globe,
-  User,
-  ArrowRight
+  CheckCircle,
+  Plus
 } from "lucide-react";
-import { format } from "date-fns";
 
-const categoryColors = {
-  general_discussion: "bg-blue-100 text-blue-800 border-blue-200",
-  bible_study: "bg-amber-100 text-amber-800 border-amber-200",
-  prayer_requests: "bg-purple-100 text-purple-800 border-purple-200",
-  testimonies: "bg-green-100 text-green-800 border-green-200",
-  youth: "bg-pink-100 text-pink-800 border-pink-200",
-  family: "bg-orange-100 text-orange-800 border-orange-200",
-  missions: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  other: "bg-gray-100 text-gray-800 border-gray-200"
-};
-
-const categoryIcons = {
-  general_discussion: Users,
-  bible_study: BookOpen,
-  prayer_requests: Heart,
-  testimonies: MessageSquare,
-  youth: Users,
-  family: Heart,
-  missions: Globe,
-  other: MessageSquare
-};
-
-export default function Forums() {
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
-  const loadPosts = async () => {
-    setIsLoading(true);
-    try {
-      const data = await ForumPost.list("-created_date", 50);
-      setPosts(data || []);
-    } catch (error) {
-      console.error("Error loading posts:", error);
-      setPosts([]);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  // Filter posts based on category and search
-  const filteredPosts = posts.filter(post => {
-    const matchesCategory = selectedCategory === "all" || post.category === selectedCategory;
-    const matchesSearch = !searchTerm.trim() || 
-      (post.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (post.content || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (post.author_name || '').toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+export default function CreatePost() {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    category: "general_discussion",
+    author_name: ""
   });
 
   const categories = [
-    { value: "all", label: "All", icon: Users },
-    { value: "general_discussion", label: "General", icon: Users },
-    { value: "bible_study", label: "Bible", icon: BookOpen },
-    { value: "prayer_requests", label: "Prayer", icon: Heart },
-    { value: "testimonies", label: "Testimonies", icon: MessageSquare },
-    { value: "youth", label: "Youth", icon: Users },
-    { value: "family", label: "Family", icon: Heart },
-    { value: "missions", label: "Missions", icon: Globe },
-    { value: "other", label: "Other", icon: MessageSquare }
+    { value: "general_discussion", label: "General Discussion" },
+    { value: "bible_study", label: "Bible Study" },
+    { value: "prayer_requests", label: "Prayer Requests" },
+    { value: "testimonies", label: "Testimonies" },
+    { value: "youth", label: "Youth" },
+    { value: "family", label: "Family" },
+    { value: "missions", label: "Missions" },
+    { value: "other", label: "Other" }
   ];
+
+  const getSelectedLabel = () => {
+    const selected = categories.find(cat => cat.value === formData.category);
+    return selected ? selected.label : "Select a category";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.title.trim() || !formData.content.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      await ForumPost.create({
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        category: formData.category,
+        author_name: formData.author_name.trim() || null,
+        is_pinned: false,
+        reply_count: 0,
+        view_count: 0
+      });
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error creating post:", error);
+    }
+    setIsSubmitting(false);
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen py-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="text-center py-12 bg-gradient-to-br from-green-50 to-blue-50 border-green-200">
+            <CardContent>
+              <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
+              <h2 className="text-2xl font-bold text-green-800 mb-4">
+                Discussion Posted Successfully!
+              </h2>
+              <p className="text-green-700 mb-8">
+                Your discussion has been created and is now visible to the community.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={() => navigate(createPageUrl("Forums"))}>
+                  View All Discussions
+                </Button>
+                <Button variant="outline" onClick={() => setSubmitted(false)}>
+                  Create Another
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Community Forums
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Button
+          variant="outline"
+          onClick={() => navigate(createPageUrl("Forums"))}
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Forums
+        </Button>
+
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Start New Discussion
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            Connect with fellow believers, share experiences, and grow together in faith.
+          <p className="text-lg text-slate-600">
+            Share your thoughts with the community
           </p>
-          
-          <Link to={createPageUrl("CreatePost")}>
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              <Plus className="w-5 h-5 mr-2" />
-              Start New Discussion
-            </Button>
-          </Link>
         </div>
 
-        {/* Search and Category Filter */}
-        <Card className="mb-8 bg-white/80 backdrop-blur-sm border-purple-100 shadow-lg">
-          <CardContent className="p-6">
-            <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Discussion</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="author_name">Your Name (Optional)</Label>
                 <Input
-                  placeholder="Search discussions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-11 border-slate-200 focus:border-purple-400 bg-white/70"
+                  id="author_name"
+                  value={formData.author_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, author_name: e.target.value }))}
+                  placeholder="Leave blank to post anonymously"
+                  className="mt-2"
                 />
               </div>
-            </div>
 
-            {/* Category Tabs */}
-            <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-              <TabsList className="w-full grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1 bg-slate-100 p-1 rounded-xl h-auto">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category.value}
-                    value={category.value}
-                    className="flex items-center justify-center gap-1 px-2 py-2 text-xs md:text-sm whitespace-nowrap"
-                  >
-                    <category.icon className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
-                    <span className="hidden sm:inline">{category.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select 
+                  value={formData.category} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue>
+                      {getSelectedLabel()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Results count */}
-            <div className="mt-2 text-sm text-slate-600">
-              Showing {filteredPosts.length} discussion{filteredPosts.length !== 1 ? 's' : ''}
-              {selectedCategory !== "all" && ` in ${selectedCategory.replace(/_/g, ' ')}`}
-            </div>
+              <div>
+                <Label htmlFor="title">Discussion Title</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="What would you like to discuss?"
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="content">Discussion Content</Label>
+                <Textarea
+                  id="content"
+                  value={formData.content}
+                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                  placeholder="Share your thoughts..."
+                  rows={10}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting || !formData.title.trim() || !formData.content.trim()}
+                className="w-full"
+              >
+                {isSubmitting ? "Creating..." : "Create Discussion"}
+              </Button>
+            </form>
           </CardContent>
         </Card>
-
-        {/* Forum Posts */}
-        {isLoading ? (
-          <div className="grid gap-6">
-            {Array(3).fill(0).map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-6 bg-slate-200 rounded w-24"></div>
-                    <div className="h-4 bg-slate-200 rounded w-20"></div>
-                  </div>
-                  <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/4 mt-2"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-slate-200 rounded"></div>
-                    <div className="h-4 bg-slate-200 rounded w-5/6"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <Card className="text-center py-12 bg-white/60 backdrop-blur-sm border-purple-100">
-            <CardContent>
-              <MessageSquare className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-600 mb-2">No Discussions Found</h3>
-              <p className="text-slate-500 mb-6">
-                {searchTerm || selectedCategory !== "all"
-                  ? "Try adjusting your search or filters"
-                  : "Start the first discussion in this community"}
-              </p>
-              <Link to={createPageUrl("CreatePost")}>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Start First Discussion
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6">
-            {filteredPosts.map((post) => {
-              const CategoryIcon = categoryIcons[post.category] || MessageSquare;
-              return (
-                <Link key={post.id} to={`/forum-post?id=${post.id}`}>
-                  <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white/80 backdrop-blur-sm border-purple-100 cursor-pointer">
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {post.is_pinned && (
-                            <Pin className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                          )}
-                          <Badge className={`${categoryColors[post.category] || categoryColors.other} border font-medium px-3 py-1 flex items-center gap-1`}>
-                            <CategoryIcon className="w-3 h-3" />
-                            <span className="text-xs">
-                              {(post.category || 'other').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </span>
-                          </Badge>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 text-sm text-slate-500 flex-shrink-0">
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-4 h-4" />
-                            <span>{post.view_count || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            <span>{post.reply_count || 0}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-xl font-semibold text-slate-800 mb-2 line-clamp-2 hover:text-purple-600 transition-colors">
-                        {post.title || 'Untitled Post'}
-                      </h3>
-                      
-                      {/* Author and Date */}
-                      <div className="flex items-center gap-3 text-sm text-slate-500">
-                        <div className="flex items-center gap-1">
-                          <User className="w-3.5 h-3.5" />
-                          <span className="font-medium">
-                            {post.author_name || 'Anonymous'}
-                          </span>
-                        </div>
-                        <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>
-                            {format(new Date(post.created_date || post.created_at || Date.now()), "MMM d, yyyy")}
-                          </span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent>
-                      <p className="text-slate-600 line-clamp-3 mb-4 leading-relaxed">
-                        {(post.content || 'No content available').substring(0, 250)}
-                        {post.content && post.content.length > 250 ? '...' : ''}
-                      </p>
-                      
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <MessageSquare className="w-4 h-4" />
-                          <span>
-                            {post.reply_count === 0 ? 'No replies yet' : 
-                             post.reply_count === 1 ? '1 reply' : 
-                             `${post.reply_count} replies`}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-1 text-sm text-purple-600 font-medium hover:text-purple-700 transition-colors">
-                          <span>Join Discussion</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </div>
     </div>
   );
