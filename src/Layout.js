@@ -29,7 +29,7 @@ export default function Layout({ children }) {
   ];
 
   const titleGradient = isForums
-  ? "bg-gradient-to-r from-green-600 to-emerald-700" // Forums color
+  ? "bg-gradient-to-r from-purple-600 to-blue-600" // Forums color
   : "bg-gradient-to-r from-blue-600 to-indigo-700";  // Questions default
 
   const isActive = (href) => location.pathname === href;
