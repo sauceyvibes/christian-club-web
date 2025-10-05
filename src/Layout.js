@@ -74,7 +74,7 @@ export default function Layout({ children }) {
               </div>
               <div>
                 <h1 className={`text-2xl font-bold ${titleGradient} bg-clip-text text-transparent`}>
-                  ${titlename}
+                  {titlename}
                 </h1>
                 <p className="text-sm text-slate-500 -mt-1">Anonymous Christian Q&A & Forums</p>
               </div>
