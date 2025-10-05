@@ -84,15 +84,15 @@ export default function Questions() {
     <div className="min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 via-sky-400 to-cyan-700 bg-clip-text text-transparent mb-4">
             Questions & Answers
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            Explore anonymous questions about faith and Christianity.
+            Ask your faith questions anonymously and get thoughtful responses from our Christian community.
           </p>
           
           <Link to={createPageUrl("AskQuestion")}>
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full">
+            <Button className="bg-gradient-to-r from-cyan-700 via-sky-400 to-cyan-700 hover:from-sky-400 hover:via-cyan-700 hover:to-sky-400 text-white px-8 py-3 rounded-full">
               <Plus className="w-5 h-5 mr-2" />
               Ask Your Question
             </Button>
@@ -101,7 +101,7 @@ export default function Questions() {
 
         {/* Search and Category Filter */}
         <Card className="mb-8 bg-white/80 backdrop-blur-sm border-blue-100 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{paddingTop: '24px', paddingBottom: '24px', paddingLeft: '24px', paddingRight: '24px'}}>
             <div className="mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />

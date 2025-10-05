@@ -310,7 +310,7 @@ export default function QuestionPage() {
           ) : (
             answers.map((answer) => (
               <Card key={answer.id} className="bg-white/80 backdrop-blur-sm border-blue-100 shadow-lg">
-                <CardContent className="p-6">
+                <CardContent className="p-6" style={{paddingTop: '24px', paddingBottom: '24px', paddingLeft: '24px', paddingRight: '24px'}}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-slate-500" />

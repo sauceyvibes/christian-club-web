@@ -41,7 +41,7 @@ export default function AskQuestion() {
 
 const getSelectedLabel = () => {
   if (!formData.category || formData.category === "other") {
-    return "Select a catagory";
+    return "Other";
   }
   const selected = categories.find(cat => cat.value === formData.category);
   return selected ? selected.label : null;
@@ -169,7 +169,7 @@ const getSelectedLabel = () => {
                 <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
                   <SelectTrigger className="mt-2 border-slate-200 focus:border-blue-400 bg-white/70">
                     {/* <SelectValue placeholder="Select a category" /> */}
-                     {getSelectedLabel()}
+                    Select a Category: {getSelectedLabel()}
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) =>

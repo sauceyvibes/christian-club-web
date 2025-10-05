@@ -1,10 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "./utils";
-import { Heart, MessageCircle, HelpCircle, Users, BookOpen, Cross } from "lucide-react";
+import { Heart, MessageCircle, HelpCircle, Users} from "lucide-react";
+import {Cross} from "@phosphor-icons/react";
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const isForums = location.pathname.startsWith("/forums");
 
   const navigation = [
     {
@@ -26,6 +28,18 @@ export default function Layout({ children }) {
       description: "Community discussions"
     }
   ];
+
+  const titleGradient = isForums
+  ? "bg-gradient-to-r from-purple-600 to-blue-600" // Forums color
+  : "bg-gradient-to-r from-blue-600 to-indigo-700";  // Questions default
+
+    const titlename = isForums
+  ? "Downriver Christian Forums" // Forums color
+  : "Downriver Christian Questions";  // Questions default
+
+    const iconbg = isForums
+  ? "bg-gradient-to-r from-purple-600 to-purple-600" // Forums color
+  : "bg-gradient-to-r from-sky-400 to-sky-400";  // Questions default
 
   const isActive = (href) => location.pathname === href;
 
@@ -55,12 +69,12 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to={createPageUrl("Questions")} className="flex items-center gap-3 hover:opacity-80 transition-all duration-300">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center peaceful-shadow">
+              <div className={`w-10 h-10 ${iconbg} rounded-lg flex items-center justify-center peaceful-shadow`}>
                 <Cross className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-                  Downriver Christian Questions
+                <h1 className={`text-2xl font-bold ${titleGradient} bg-clip-text text-transparent`}>
+                  {titlename}
                 </h1>
                 <p className="text-sm text-slate-500 -mt-1">Anonymous Christian Q&A & Forums</p>
               </div>

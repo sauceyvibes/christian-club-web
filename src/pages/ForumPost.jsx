@@ -322,7 +322,7 @@ export default function ForumPostPage() {
           ) : (
             replies.map((reply, index) => (
               <Card key={reply.id} className="bg-white/80 backdrop-blur-sm border-purple-100 shadow-lg">
-                <CardContent className="p-6">
+                <CardContent className="p-6" style={{paddingTop: '24px', paddingBottom: '24px', paddingLeft: '24px', paddingRight: '24px'}}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-slate-500" />

@@ -117,7 +117,7 @@ export default function Forums() {
 
         {/* Search and Category Filter */}
         <Card className="mb-8 bg-white/80 backdrop-blur-sm border-purple-100 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{paddingTop: '24px', paddingBottom: '24px', paddingLeft: '24px', paddingRight: '24px'}}>
             <div className="mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
