@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { Heart, MessageCircle, HelpCircle, Users} from "lucide-react";
-import {Cross} from "phosphor-react";
+import {Cross} from "@phosphor-icons/react";
 
 export default function Layout({ children }) {
   const location = useLocation();
