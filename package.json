@@ -14,7 +14,8 @@
     "date-fns": "^4.1.0",
     "lucide-react": "^0.277.0",
     "web-vitals": "^2.1.4",
-    "@phosphor-icons/react": "^2.0.0"
+    "@phosphor-icons/react": "^2.0.0",
+    "firebase": "^10.7.1"
   },
   "scripts": {
     "start": "react-scripts start",

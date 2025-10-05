@@ -21,6 +21,7 @@ function App() {
           <Route path="/question" element={<Question />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/forum-post" element={<ForumPost />} />
+          <Route path="/admin-key=69420-67" element={<AdminPanel />} />
         </Routes>
       </Layout>
     </Router>
