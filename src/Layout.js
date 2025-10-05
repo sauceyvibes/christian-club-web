@@ -5,7 +5,7 @@ import { Heart, MessageCircle, HelpCircle, Users, BookOpen, Cross } from "lucide
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const isForums = location.pathname.startsWith("/Forums");
+  const isForums = location.pathname.startsWith("Forums");
 
   const navigation = [
     {
