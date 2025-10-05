@@ -41,7 +41,7 @@ export default function AskQuestion() {
 
 const getSelectedLabel = () => {
   if (!formData.category || formData.category === "other") {
-    return "other";
+    return "Other";
   }
   const selected = categories.find(cat => cat.value === formData.category);
   return selected ? selected.label : null;
