@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "./utils";
-import { Heart, MessageCircle, HelpCircle, Users, BookOpen, Cross } from "lucide-react";
+import { Heart, MessageCircle, HelpCircle, Users} from "lucide-react";
+import {Cross} from "phosphor-react";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -60,7 +61,7 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to={createPageUrl("Questions")} className="flex items-center gap-3 hover:opacity-80 transition-all duration-300">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center peaceful-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-sky-400 rounded-lg flex items-center justify-center peaceful-shadow">
                 <Cross className="w-6 h-6 text-white" />
               </div>
               <div>
