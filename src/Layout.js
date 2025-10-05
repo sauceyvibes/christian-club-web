@@ -27,7 +27,7 @@ export default function Layout({ children }) {
     }
   ];
 
-  const isForums = pathname.startsWith("/Forums");
+  const isForums = location.startsWith("/Forums");
 
   const titleGradient = isForums
   ? "bg-gradient-to-r from-green-600 to-emerald-700" // Forums color
