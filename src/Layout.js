@@ -5,6 +5,7 @@ import { Heart, MessageCircle, HelpCircle, Users, BookOpen, Cross } from "lucide
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const isForums = location.pathname.startsWith("/Forums");
 
   const navigation = [
     {
@@ -26,8 +27,6 @@ export default function Layout({ children }) {
       description: "Community discussions"
     }
   ];
-
-  const isForums = location.startsWith("/Forums");
 
   const titleGradient = isForums
   ? "bg-gradient-to-r from-green-600 to-emerald-700" // Forums color
