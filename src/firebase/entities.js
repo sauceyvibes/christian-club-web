@@ -24,6 +24,7 @@ class FirebaseEntity {
       const docRef = await addDoc(collection(db, this.collectionName), {
         ...data,
         created_at: new Date().toISOString(),
+        created_date: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
       
@@ -31,6 +32,7 @@ class FirebaseEntity {
         id: docRef.id,
         ...data,
         created_at: new Date().toISOString(),
+        created_date: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
     } catch (error) {
@@ -54,11 +56,23 @@ class FirebaseEntity {
     }
   }
 
-  async list(sortField = 'created_at', sortDirection = 'desc', limitCount = 50) {
+  async list(sortField = '-created_at', limitCount = 50) {
     try {
+      // Handle '-' prefix for descending order
+      const isDescending = sortField.startsWith('-');
+      const actualField = isDescending ? sortField.substring(1) : sortField;
+      const direction = isDescending ? 'desc' : 'asc';
+      
+      // Map old field names to new ones
+      const fieldMap = {
+        'created_date': 'created_at',
+        'updated_date': 'updated_at'
+      };
+      const mappedField = fieldMap[actualField] || actualField;
+      
       const q = query(
         collection(db, this.collectionName),
-        orderBy(sortField, sortDirection),
+        orderBy(mappedField, direction),
         limit(limitCount)
       );
       
@@ -98,11 +112,14 @@ class FirebaseEntity {
     }
   }
 
-  async find(field, value) {
+  async find(criteria) {
     try {
+      const fieldName = Object.keys(criteria)[0];
+      const fieldValue = criteria[fieldName];
+      
       const q = query(
         collection(db, this.collectionName),
-        where(field, '==', value)
+        where(fieldName, '==', fieldValue)
       );
       
       const querySnapshot = await getDocs(q);
@@ -156,7 +173,7 @@ class AnswerEntity extends FirebaseEntity {
   }
 
   async getByQuestionId(questionId) {
-    return await this.find('question_id', questionId);
+    return await this.find({ question_id: questionId });
   }
 
   async incrementHelpfulCount(id) {
@@ -190,13 +207,13 @@ class ForumReplyEntity extends FirebaseEntity {
   }
 
   async getByPostId(postId) {
-    return await this.find('post_id', postId);
+    return await this.find({ post_id: postId });
   }
 
   async getThreadReplies(postId) {
     const replies = await this.getByPostId(postId);
     return replies.sort((a, b) => 
-      new Date(a.created_at) - new Date(b.created_at)
+      new Date(a.created_at || a.created_date) - new Date(b.created_at || b.created_date)
     );
   }
 }

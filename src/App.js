@@ -7,6 +7,7 @@ import Forums from './pages/Forums';
 import Question from './pages/Question';
 import CreatePost from './pages/CreatePost';
 import ForumPost from './pages/ForumPost';
+import AdminPanel from './pages/AdminPanel';
 import './App.css';
 
 function App() {
