@@ -27,3 +27,9 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 export default app;
+
+// For debugging purposes
+
+console.log('Firebase initialized:', app);
+console.log('Firestore db:', db);
+console.log('Auth:', auth);

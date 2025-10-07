@@ -32,24 +32,34 @@ export default function AdminPanel() {
     return unsubscribe;
   }, []);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    try {
-      const [q, a, p, r] = await Promise.all([
-        Question.list('created_at', 'desc', 100),
-        Answer.list('created_at', 'desc', 100),
-        ForumPost.list('created_at', 'desc', 100),
-        ForumReply.list('created_at', 'desc', 100)
-      ]);
-      setQuestions(q);
-      setAnswers(a);
-      setPosts(p);
-      setReplies(r);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-    setLoading(false);
-  };
+const loadAllData = async () => {
+  setLoading(true);
+  console.log('Loading data from Firebase...');
+  
+  try {
+    const [q, a, p, r] = await Promise.all([
+      Question.list('created_at', 'desc', 100),
+      Answer.list('created_at', 'desc', 100),
+      ForumPost.list('created_at', 'desc', 100),
+      ForumReply.list('created_at', 'desc', 100)
+    ]);
+    
+    console.log('Questions loaded:', q);
+    console.log('Answers loaded:', a);
+    console.log('Posts loaded:', p);
+    console.log('Replies loaded:', r);
+    
+    setQuestions(q);
+    setAnswers(a);
+    setPosts(p);
+    setReplies(r);
+  } catch (error) {
+    console.error('Error loading data:', error);
+    alert('Error loading data. Check console for details.');
+  }
+  
+  setLoading(false);
+};
 
   const handleLogin = async (e) => {
     e.preventDefault();
