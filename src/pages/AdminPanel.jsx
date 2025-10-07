@@ -6,8 +6,8 @@ import { Question, Answer, ForumPost, ForumReply } from '../entities/all';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from '../components/ui/all';
 import { Trash2, LogOut, Lock, Eye, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { JellyTriangle } from 'ldrs/react'
-import 'ldrs/react/JellyTriangle.css'
+import { Trio } from 'ldrs/react'
+import 'ldrs/react/Trio.css'
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -191,8 +191,8 @@ export default function AdminPanel() {
 
         {loading ? (
           // Default values shown
-          <JellyTriangle
-            size="30"
+          <Trio
+            size="150"
            speed="1.75"
            color="black" 
           />
