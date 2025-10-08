@@ -149,9 +149,9 @@ export default function CreatePost() {
                   value={formData.category} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                 >
-                  <SelectTrigger className="mt-2">
+                  <SelectTrigger className="mt-2 text-gray-950">
                     <SelectValue>
-                      {getSelectedLabel()}
+                      Select a Category: {getSelectedLabel()}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
