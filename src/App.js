@@ -22,7 +22,7 @@ function App() {
           <Route path="/question" element={<Question />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/forum-post" element={<ForumPost />} />
-          <Route path="/admin-key=5241269709-67!" element={<AdminPanel />} />
+          <Route path="/admin-key=5241269709-67" element={<AdminPanel />} />
         </Routes>
       </Layout>
     </Router>
