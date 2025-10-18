@@ -6,7 +6,7 @@ import {Cross} from "@phosphor-icons/react";
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const isForums = location.pathname.startsWith("/forums");
+  const isForums = location.pathname.startsWith("/Forum");
 
   const navigation = [
     {
@@ -29,15 +29,15 @@ export default function Layout({ children }) {
     }
   ];
 
-  const titleGradient = isForums
+  const titleGradient = (isForums || location.pathname === "/create-post")
   ? "bg-gradient-to-r from-purple-600 to-blue-600" // Forums color
   : "bg-gradient-to-r from-blue-600 to-indigo-700";  // Questions default
 
-    const titlename = isForums
+    const titlename = (isForums || location.pathname === "/create-post")
   ? "Downriver Christian Forums" // Forums color
   : "Downriver Christian Questions";  // Questions default
 
-    const iconbg = isForums
+    const iconbg = (isForums || location.pathname === "/create-post")
   ? "bg-gradient-to-r from-purple-600 to-purple-600" // Forums color
   : "bg-gradient-to-r from-sky-400 to-sky-400";  // Questions default
 
