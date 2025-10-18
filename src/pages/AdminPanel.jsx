@@ -186,6 +186,31 @@ export default function AdminPanel() {
     }
   };
 
+  const handleToggleVerified = async (answerId, currentStatus) => {
+    const newStatus = !currentStatus;
+    const action = newStatus ? 'verify' : 'unverify';
+    
+    if (!window.confirm(`Are you sure you want to ${action} this answer?`)) return;
+    
+    try {
+      const answerRef = doc(db, 'answers', answerId);
+      await updateDoc(answerRef, {
+        is_verified: newStatus,
+        updated_at: new Date().toISOString()
+      });
+      
+      console.log(`✅ Answer ${newStatus ? 'verified' : 'unverified'} successfully`);
+      
+      // Update local state without full reload
+      setAnswers(prev => prev.map(a => 
+        a.id === answerId ? { ...a, is_verified: newStatus } : a
+      ));
+    } catch (error) {
+      console.error('❌ Error updating verification status:', error);
+      alert(`Failed to ${action} answer: ${error.message}`);
+    }
+  };
+
   const handleDeletePost = async (id) => {
     if (!window.confirm('Delete this post and all its replies? This cannot be undone.')) return;
     
@@ -419,26 +444,41 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <div className="divide-y">
-                    {answers.map((a) => (
-                      <div key={a.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 mb-2 line-clamp-3">{a.content}</p>
-                          <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="font-medium">{a.author_name || 'Anonymous'}</span>
-                            <span>•</span>
-                            <span>{a.created_at ? format(new Date(a.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                    {answers.map((a) => {
+                      const relatedQuestion = questions.find(q => q.id === a.question_id);
+                      return (
+                        <div key={a.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            {relatedQuestion && (
+                              <div className="mb-2 p-2 bg-blue-50 border-l-4 border-blue-400 rounded">
+                                <p className="text-xs text-blue-600 font-medium mb-1">Answer to:</p>
+                                <p className="text-sm text-blue-800 font-semibold truncate">{relatedQuestion.title}</p>
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-700 mb-2 line-clamp-3">{a.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-slate-500">
+                              <span className="font-medium">{a.author_name || 'Anonymous'}</span>
+                              <span>•</span>
+                              <span>{a.created_at ? format(new Date(a.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                              {a.helpful_count > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-green-600">👍 {a.helpful_count}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteAnswer(a.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteAnswer(a.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -497,26 +537,35 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <div className="divide-y">
-                    {replies.map((r) => (
-                      <div key={r.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 mb-2 line-clamp-3">{r.content}</p>
-                          <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="font-medium">{r.author_name || 'Anonymous'}</span>
-                            <span>•</span>
-                            <span>{r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                    {replies.map((r) => {
+                      const relatedPost = posts.find(p => p.id === r.post_id);
+                      return (
+                        <div key={r.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            {relatedPost && (
+                              <div className="mb-2 p-2 bg-purple-50 border-l-4 border-purple-400 rounded">
+                                <p className="text-xs text-purple-600 font-medium mb-1">Reply to:</p>
+                                <p className="text-sm text-purple-800 font-semibold truncate">{relatedPost.title}</p>
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-700 mb-2 line-clamp-3">{r.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-slate-500">
+                              <span className="font-medium">{r.author_name || 'Anonymous'}</span>
+                              <span>•</span>
+                              <span>{r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                            </div>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteReply(r.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteReply(r.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
