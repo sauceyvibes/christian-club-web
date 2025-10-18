@@ -21,6 +21,7 @@ export default function AdminPanel() {
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [deleteMode, setDeleteMode] = useState(false);
 
   // Monitor auth state
   useEffect(() => {
@@ -151,6 +152,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteQuestion = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this question and all its answers? This cannot be undone.')) return;
     
     try {
@@ -174,6 +179,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteAnswer = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this answer?')) return;
     
     try {
@@ -212,6 +221,10 @@ export default function AdminPanel() {
   };
 
   const handleDeletePost = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this post and all its replies? This cannot be undone.')) return;
     
     try {
@@ -233,6 +246,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteReply = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this reply?')) return;
     
     try {
@@ -318,7 +335,22 @@ export default function AdminPanel() {
               Logged in as: <span className="font-medium">{currentUser?.email}</span>
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg">
+              <label className="text-sm font-medium text-slate-700">Delete Mode</label>
+              <button
+                onClick={() => setDeleteMode(!deleteMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  deleteMode ? 'bg-red-600' : 'bg-slate-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    deleteMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
             <Button 
               onClick={loadAllData} 
               variant="outline"
@@ -420,7 +452,8 @@ export default function AdminPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteQuestion(q.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          disabled={!deleteMode}
+                          className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -466,16 +499,49 @@ export default function AdminPanel() {
                                   <span className="text-green-600">👍 {a.helpful_count}</span>
                                 </>
                               )}
+                              {a.is_verified && (
+                                <>
+                                  <span>•</span>
+                                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Verified
+                                  </Badge>
+                                </>
+                              )}
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteAnswer(a.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <div className="flex flex-col gap-2 ml-4 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleVerified(a.id, a.is_verified)}
+                              className={a.is_verified 
+                                ? "text-orange-600 hover:text-orange-700 hover:bg-orange-50" 
+                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                              }
+                            >
+                              {a.is_verified ? (
+                                <>
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  Unverify
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Verify
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteAnswer(a.id)}
+                              disabled={!deleteMode}
+                              className={`text-red-600 hover:text-red-700 hover:bg-red-50 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       );
                     })}
@@ -513,7 +579,8 @@ export default function AdminPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeletePost(p.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          disabled={!deleteMode}
+                          className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -559,7 +626,8 @@ export default function AdminPanel() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteReply(r.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                            disabled={!deleteMode}
+                            className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
