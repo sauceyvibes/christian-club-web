@@ -6,8 +6,8 @@ import {Cross} from "@phosphor-icons/react";
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const isForums = (location.pathname.startsWith("/forums") || location.pathname.startsWith("/forum-post" || location.pathname.startsWith("/create-post")));
-
+//  const isForums = (location.pathname.startsWith("/forums") || location.pathname.startsWith("/forum-post" || location.pathname.startsWith("/create-post")));
+  const isForums = ["/forums", "/create-post", "forum-post"]; //ai recomendation says
   const navigation = [
     {
       name: "Questions",
