@@ -7,7 +7,7 @@ import {Cross} from "@phosphor-icons/react";
 export default function Layout({ children }) {
   const location = useLocation();
 //  const isForums = (location.pathname.startsWith("/forums") || location.pathname.startsWith("/forum-post" || location.pathname.startsWith("/create-post")));
-  const isForums = ["/forums", "/create-post", "forum-post"]; //ai recomendation says
+  const ForumPaths = ["/forums", "/create-post", "forum-post"];
   const navigation = [
     {
       name: "Questions",
@@ -28,6 +28,10 @@ export default function Layout({ children }) {
       description: "Community discussions"
     }
   ];
+
+const isForums = ForumPaths.some(path =>
+  path === location.pathname || location.pathname.startsWith(path)
+);
 
   const titleGradient = isForums
   ? "bg-gradient-to-r from-purple-600 to-blue-600" // Forums color
