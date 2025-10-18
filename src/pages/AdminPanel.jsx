@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, deleteDoc, doc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from '../components/ui/all';
-import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle } from 'lucide-react';
+import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AdminPanel() {
