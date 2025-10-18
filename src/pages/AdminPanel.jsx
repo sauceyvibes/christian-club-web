@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebas
 import { collection, getDocs, deleteDoc, doc, query, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from '../components/ui/all';
-import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle, CheckCircle, XCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AdminPanel() {
@@ -22,6 +22,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [deleteMode, setDeleteMode] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Monitor auth state
   useEffect(() => {
@@ -149,6 +150,55 @@ export default function AdminPanel() {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  };
+
+  const handleExportBackup = async () => {
+    setIsExporting(true);
+    
+    try {
+      // Create backup object with all data
+      const backup = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          exportedBy: currentUser?.email,
+          version: '1.0',
+          totalRecords: questions.length + answers.length + posts.length + replies.length
+        },
+        questions: questions,
+        answers: answers,
+        forum_posts: posts,
+        forum_replies: replies
+      };
+
+      // Convert to JSON string with pretty formatting
+      const jsonString = JSON.stringify(backup, null, 2);
+      
+      // Create blob and download
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Create filename with timestamp
+      const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm-ss');
+      link.download = `firestore-backup_${timestamp}.json`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      console.log('✅ Backup exported successfully');
+      alert('Backup exported successfully! Check your downloads folder.');
+    } catch (error) {
+      console.error('❌ Error exporting backup:', error);
+      alert(`Failed to export backup: ${error.message}`);
+    }
+    
+    setIsExporting(false);
   };
 
   const handleDeleteQuestion = async (id) => {
@@ -335,7 +385,7 @@ export default function AdminPanel() {
               Logged in as: <span className="font-medium">{currentUser?.email}</span>
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg">
               <label className="text-sm font-medium text-slate-700">Delete Mode</label>
               <button
@@ -351,6 +401,15 @@ export default function AdminPanel() {
                 />
               </button>
             </div>
+            <Button 
+              onClick={handleExportBackup}
+              variant="outline"
+              disabled={isExporting || loading}
+              className="border-green-200 text-green-700 hover:bg-green-50"
+            >
+              <Download className={`w-4 h-4 mr-2 ${isExporting ? 'animate-bounce' : ''}`} />
+              {isExporting ? 'Exporting...' : 'Export Backup'}
+            </Button>
             <Button 
               onClick={loadAllData} 
               variant="outline"
