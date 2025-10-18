@@ -1,3 +1,5 @@
 User-agent: *
-Disallow:
+Disallow: /admin-key=5241269709-67
+Allow: /
+
 Sitemap: https://downriverchristianquestions.org/sitemap.xml
