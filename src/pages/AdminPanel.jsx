@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, deleteDoc, doc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from '../components/ui/all';
-import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle } from 'lucide-react';
+import { Trash2, LogOut, Lock, Eye, MessageCircle, RefreshCw, AlertCircle, CheckCircle, XCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AdminPanel() {
@@ -21,6 +21,8 @@ export default function AdminPanel() {
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Monitor auth state
   useEffect(() => {
@@ -150,7 +152,60 @@ export default function AdminPanel() {
     }
   };
 
+  const handleExportBackup = async () => {
+    setIsExporting(true);
+    
+    try {
+      // Create backup object with all data
+      const backup = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          exportedBy: currentUser?.email,
+          version: '1.0',
+          totalRecords: questions.length + answers.length + posts.length + replies.length
+        },
+        questions: questions,
+        answers: answers,
+        forum_posts: posts,
+        forum_replies: replies
+      };
+
+      // Convert to JSON string with pretty formatting
+      const jsonString = JSON.stringify(backup, null, 2);
+      
+      // Create blob and download
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Create filename with timestamp
+      const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm-ss');
+      link.download = `firestore-backup_${timestamp}.json`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      console.log('✅ Backup exported successfully');
+      alert('Backup exported successfully! Check your downloads folder.');
+    } catch (error) {
+      console.error('❌ Error exporting backup:', error);
+      alert(`Failed to export backup: ${error.message}`);
+    }
+    
+    setIsExporting(false);
+  };
+
   const handleDeleteQuestion = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this question and all its answers? This cannot be undone.')) return;
     
     try {
@@ -174,6 +229,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteAnswer = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this answer?')) return;
     
     try {
@@ -186,7 +245,36 @@ export default function AdminPanel() {
     }
   };
 
+  const handleToggleVerified = async (answerId, currentStatus) => {
+    const newStatus = !currentStatus;
+    const action = newStatus ? 'verify' : 'unverify';
+    
+    if (!window.confirm(`Are you sure you want to ${action} this answer?`)) return;
+    
+    try {
+      const answerRef = doc(db, 'answers', answerId);
+      await updateDoc(answerRef, {
+        is_verified: newStatus,
+        updated_at: new Date().toISOString()
+      });
+      
+      console.log(`✅ Answer ${newStatus ? 'verified' : 'unverified'} successfully`);
+      
+      // Update local state without full reload
+      setAnswers(prev => prev.map(a => 
+        a.id === answerId ? { ...a, is_verified: newStatus } : a
+      ));
+    } catch (error) {
+      console.error('❌ Error updating verification status:', error);
+      alert(`Failed to ${action} answer: ${error.message}`);
+    }
+  };
+
   const handleDeletePost = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this post and all its replies? This cannot be undone.')) return;
     
     try {
@@ -208,6 +296,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteReply = async (id) => {
+    if (!deleteMode) {
+      alert('Please enable Delete Mode using the switch at the top to delete items.');
+      return;
+    }
     if (!window.confirm('Delete this reply?')) return;
     
     try {
@@ -293,7 +385,31 @@ export default function AdminPanel() {
               Logged in as: <span className="font-medium">{currentUser?.email}</span>
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg">
+              <label className="text-sm font-medium text-slate-700">Delete Mode</label>
+              <button
+                onClick={() => setDeleteMode(!deleteMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  deleteMode ? 'bg-red-600' : 'bg-slate-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    deleteMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <Button 
+              onClick={handleExportBackup}
+              variant="outline"
+              disabled={isExporting || loading}
+              className="border-green-200 text-green-700 hover:bg-green-50"
+            >
+              <Download className={`w-4 h-4 mr-2 ${isExporting ? 'animate-bounce' : ''}`} />
+              {isExporting ? 'Exporting...' : 'Export Backup'}
+            </Button>
             <Button 
               onClick={loadAllData} 
               variant="outline"
@@ -395,7 +511,8 @@ export default function AdminPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteQuestion(q.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          disabled={!deleteMode}
+                          className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -419,26 +536,74 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <div className="divide-y">
-                    {answers.map((a) => (
-                      <div key={a.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 mb-2 line-clamp-3">{a.content}</p>
-                          <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="font-medium">{a.author_name || 'Anonymous'}</span>
-                            <span>•</span>
-                            <span>{a.created_at ? format(new Date(a.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                    {answers.map((a) => {
+                      const relatedQuestion = questions.find(q => q.id === a.question_id);
+                      return (
+                        <div key={a.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            {relatedQuestion && (
+                              <div className="mb-2 p-2 bg-blue-50 border-l-4 border-blue-400 rounded">
+                                <p className="text-xs text-blue-600 font-medium mb-1">Answer to:</p>
+                                <p className="text-sm text-blue-800 font-semibold truncate">{relatedQuestion.title}</p>
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-700 mb-2 line-clamp-3">{a.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-slate-500">
+                              <span className="font-medium">{a.author_name || 'Anonymous'}</span>
+                              <span>•</span>
+                              <span>{a.created_at ? format(new Date(a.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                              {a.helpful_count > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-green-600">👍 {a.helpful_count}</span>
+                                </>
+                              )}
+                              {a.is_verified && (
+                                <>
+                                  <span>•</span>
+                                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Verified
+                                  </Badge>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2 ml-4 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleVerified(a.id, a.is_verified)}
+                              className={a.is_verified 
+                                ? "text-orange-600 hover:text-orange-700 hover:bg-orange-50" 
+                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                              }
+                            >
+                              {a.is_verified ? (
+                                <>
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  Unverify
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Verify
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteAnswer(a.id)}
+                              disabled={!deleteMode}
+                              className={`text-red-600 hover:text-red-700 hover:bg-red-50 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteAnswer(a.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -473,7 +638,8 @@ export default function AdminPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeletePost(p.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
+                          disabled={!deleteMode}
+                          className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -497,26 +663,36 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <div className="divide-y">
-                    {replies.map((r) => (
-                      <div key={r.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 mb-2 line-clamp-3">{r.content}</p>
-                          <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="font-medium">{r.author_name || 'Anonymous'}</span>
-                            <span>•</span>
-                            <span>{r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                    {replies.map((r) => {
+                      const relatedPost = posts.find(p => p.id === r.post_id);
+                      return (
+                        <div key={r.id} className="flex justify-between items-start p-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            {relatedPost && (
+                              <div className="mb-2 p-2 bg-purple-50 border-l-4 border-purple-400 rounded">
+                                <p className="text-xs text-purple-600 font-medium mb-1">Reply to:</p>
+                                <p className="text-sm text-purple-800 font-semibold truncate">{relatedPost.title}</p>
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-700 mb-2 line-clamp-3">{r.content}</p>
+                            <div className="flex items-center gap-3 text-xs text-slate-500">
+                              <span className="font-medium">{r.author_name || 'Anonymous'}</span>
+                              <span>•</span>
+                              <span>{r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : 'Unknown date'}</span>
+                            </div>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteReply(r.id)}
+                            disabled={!deleteMode}
+                            className={`text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0 ${!deleteMode ? 'opacity-40 cursor-not-allowed' : ''}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteReply(r.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-4 flex-shrink-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
