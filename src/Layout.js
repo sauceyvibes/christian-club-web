@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "./utils";
-import { Heart, MessageCircle, HelpCircle, Users} from "lucide-react";
-import {Cross} from "@phosphor-icons/react";
+import { Heart, MessageCircle, HelpCircle, Users, X } from "lucide-react";
+import { Cross } from "@phosphor-icons/react";
 
 export default function Layout({ children }) {
   const location = useLocation();
-//  const isForums = (location.pathname.startsWith("/forums") || location.pathname.startsWith("/forum-post" || location.pathname.startsWith("/create-post")));
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const ForumPaths = ["/forums", "/create-post", "forum-post"];
   const navigation = [
     {
@@ -29,23 +30,31 @@ export default function Layout({ children }) {
     }
   ];
 
-const isForums = ForumPaths.some(path =>
-  path === location.pathname || location.pathname.startsWith(path)
-);
+  const isForums = ForumPaths.some(path =>
+    path === location.pathname || location.pathname.startsWith(path)
+  );
 
   const titleGradient = isForums
-  ? "bg-gradient-to-r from-purple-600 to-blue-600" // Forums color
-  : "bg-gradient-to-r from-blue-600 to-indigo-700";  // Questions default
+    ? "bg-gradient-to-r from-purple-600 to-blue-600"
+    : "bg-gradient-to-r from-blue-600 to-indigo-700";
 
-    const titlename = isForums
-  ? "Downriver Christian Forums" // Forums color
-  : "Downriver Christian Questions";  // Questions default
+  const titlename = isForums
+    ? "Downriver Christian Forums"
+    : "Downriver Christian Questions";
 
-    const iconbg = isForums
-  ? "bg-gradient-to-r from-purple-600 to-purple-600" // Forums color
-  : "bg-gradient-to-r from-sky-400 to-sky-400";  // Questions default
+  const iconbg = isForums
+    ? "bg-gradient-to-r from-purple-600 to-purple-600"
+    : "bg-gradient-to-r from-sky-400 to-sky-400";
 
   const isActive = (href) => location.pathname === href;
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prev => !prev);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -103,10 +112,18 @@ const isForums = ForumPaths.some(path =>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button className="p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+              <button 
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
@@ -114,27 +131,30 @@ const isForums = ForumPaths.some(path =>
       </header>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden bg-white/95 backdrop-blur-md border-b border-blue-100 peaceful-shadow">
-        <div className="px-4 py-3 space-y-1">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ${
-                isActive(item.href)
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
-              }`}
-            >
-              <item.icon className="w-4 h-4" />
-              <div>
-                <p className="font-medium">{item.name}</p>
-                <p className="text-xs text-slate-500">{item.description}</p>
-              </div>
-            </Link>
-          ))}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white/95 backdrop-blur-md border-b border-blue-100 peaceful-shadow">
+          <div className="px-4 py-3 space-y-1">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={closeMobileMenu}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ${
+                  isActive(item.href)
+                    ? "bg-blue-100 text-blue-700"
+                    : "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
+                }`}
+              >
+                <item.icon className="w-4 h-4" />
+                <div>
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-xs text-slate-500">{item.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1">
