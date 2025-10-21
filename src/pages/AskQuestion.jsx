@@ -169,8 +169,8 @@ const getSelectedLabel = () => {
                 <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
                   <SelectTrigger className="mt-2 border-slate-200 focus:border-blue-400 bg-white/70">
                     {/* <SelectValue placeholder="Select a category" /> */}
-                    <Span classname= "text-gray-500">select a Category:</span>
-                    <span classname= "text-black"> {getSelectedLabel()}</span>
+                    <span className= "text-gray-500">select a Category:</span>
+                    <span className= "text-black"> {getSelectedLabel()}</span>
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) =>
