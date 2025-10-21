@@ -152,7 +152,7 @@ export default function CreatePost() {
                   <SelectTrigger className="mt-2">
                     <SelectValue>
                       Select a Category: 
-                      <span className="text-black">{getSelectedLabel()} </span>
+                      <span className="text-black"> {getSelectedLabel()} </span>
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
